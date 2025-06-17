@@ -27,7 +27,7 @@ function scrapeMarrTopics() {
   
     //Logger.log(results);
     // シートに出力
-    writeToSheet(results);
+    writeToSheet(results, "M&A速報");
 }
 
 
@@ -80,8 +80,11 @@ function parseTopicsNewsItem(liElementStr) {
 
 
 // シートへ出力
-const writeToSheet = (datas) => {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+const writeToSheet = (datas, sheetTitle) => {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetTitle);
+    if (!sheet) {
+        sheet = setServers.insertSheet(sheetTitle);
+    }
     sheet.clear();   // 暫定
 
     sheet.appendRow(["id", "title", "url", "genre", "date"]);
