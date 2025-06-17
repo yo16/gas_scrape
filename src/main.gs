@@ -52,7 +52,7 @@ function parseTopicsNewsItem(liElementStr) {
 
     // idを取り出す
     const idMatch = liElement.match(/id="([^"]*)"/);
-    const id = idMatch ? idMatch[1] : '';
+    const id = idMatch ? idMatch[1].trim() : '';
 
     // 記事の中身
     // タイトル
@@ -70,7 +70,7 @@ function parseTopicsNewsItem(liElementStr) {
     const date = genreAndDateMatch ? genreAndDateMatch[2].trim() : '';
 
     return {
-        id,
+        id: parseInt(id),
         title: unescapeHtml(title),
         url,
         genre: unescapeHtml(genre),
@@ -84,13 +84,31 @@ const writeToSheet = (datas, sheetTitle) => {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetTitle);
     if (!sheet) {
         sheet = setServers.insertSheet(sheetTitle);
+        sheet.appendRow(["id", "title", "url", "genre", "date"]);
     }
-    sheet.clear();   // 暫定
 
-    sheet.appendRow(["id", "title", "url", "genre", "date"]);
+    // シートの最終行を取得
+    const lastRow = sheet.getLastRow();
+    // シートの最終列を取得
+    const lastColumn = sheet.getLastColumn();
+
+    // 1列目を取得
+    const column1 = sheet.getRange(1, 1, lastRow, 1);  // ヘッダーを除く
+    const column1Data = column1.getValues().flat();
+
+    // １要素ずつ、行末に追加する
+    // ただし、1列目だけを検索して、idがすでに存在する場合はスキップする
     datas.forEach(data => {
-        sheet.appendRow([data.id, data.title, data.url, data.genre, data.date]);
+        if (!column1Data.includes(data.id)) {
+            sheet.appendRow([data.id, data.title, data.url, data.genre, data.date]);
+        }
     });
+    
+    // シートの最終行を取得
+    const lastRowUpdated = sheet.getLastRow();
+
+    // 1列目を降順でソートする
+    sheet.getRange(2, 1, lastRowUpdated - 1, lastColumn).sort({column: 1, ascending: false});
 }
 
 
