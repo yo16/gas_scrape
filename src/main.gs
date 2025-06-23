@@ -1,5 +1,5 @@
-// M&A速報(https://www.marr.jp/genre/topics/news/)をパースする
-function scrapeMarrTopics() {
+// M&A速報(https://www.marr.jp/genre/topics/news/)をスクレイプする
+function scrapeMarrTopicsNews() {
     const url = 'https://www.marr.jp/genre/topics/news/';
     const response = UrlFetchApp.fetch(url);
     const html = response.getContentText();
